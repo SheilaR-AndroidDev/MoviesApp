@@ -1,5 +1,6 @@
 package com.example.fullapp.remote.di
 
+import android.content.Context
 import com.example.fullapp.remote.Constants.BASE_URL
 import com.example.fullapp.remote.data.api.MoviesApi
 import com.example.fullapp.remote.data.repository.MoviesRepositoryImpl
@@ -7,6 +8,7 @@ import com.example.fullapp.remote.domain.repository.MoviesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory
 import retrofit2.Retrofit

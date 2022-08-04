@@ -1,10 +1,9 @@
 package com.example.fullapp.remote.presentation.movies
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.fullapp.remote.Constants.API_KEY
+import com.example.fullapp.remote.Constants
 import com.example.fullapp.remote.domain.repository.MoviesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -15,39 +14,37 @@ import com.example.fullapp.remote.domain.model.Result
 
 @HiltViewModel
 class MoviesViewModel @Inject constructor(
-    repository: MoviesRepository
+    private val repository: MoviesRepository
 )
 : ViewModel() {
     // TODO: Implement the ViewModel
     private var _allMovies = MutableLiveData<List<Result>>()
     val allMovies : LiveData<List<Result>> = _allMovies
 
+    private val _error = MutableLiveData<String>()
+    val error : LiveData<String> = _error
+
     private val disposable = CompositeDisposable()
 
     init {
+        retrieveAllMovies()
+    }
 
-       disposable.add(
-            repository.getAllMovies(API_KEY)
+    private fun retrieveAllMovies() {
+        disposable.add(
+            repository.getAllMovies(Constants.API_KEY)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    handleSucess(it.results)
-                },{
-                    handleError(it)
-           })
+                    _allMovies.value = it.results
+                }, {
+                    _error.value = it.message
+                })
         )
-    }
-
-    private fun handleSucess(list: List<Result>){
-        _allMovies.value = list
-    }
-
-    private fun handleError(error: Throwable){
-        Log.i("tag", "error al consultar la api ${error.message}")
     }
 
     override fun onCleared() {
         super.onCleared()
-        disposable.dispose()
+        disposable.clear()
     }
 }
